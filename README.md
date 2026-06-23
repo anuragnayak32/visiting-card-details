@@ -48,29 +48,82 @@ START → Upload Audio → Find Contact by Session → Transcribe (Whisper)
 
 ```
 Krid.AI/
+│
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # FastAPI entry point
-│   │   ├── config.py            # Environment settings
-│   │   ├── api/routes.py        # REST endpoints
+│   │   ├── main.py                     # FastAPI entry point
+│   │   ├── config.py                   # Environment & application settings
+│   │   │
+│   │   ├── api/
+│   │   │   └── routes.py               # REST API endpoints
+│   │   │
 │   │   ├── agent/
-│   │   │   ├── graph.py         # LangGraph definition
-│   │   │   ├── nodes.py         # Agent nodes
-│   │   │   └── state.py         # AgentState TypedDict
-│   │   ├── services/            # External integrations
-│   │   ├── models/              # MongoDB client
-│   │   ├── schemas/             # Pydantic models
-│   │   └── utils/               # Helpers
+│   │   │   ├── graph.py                # LangGraph workflow definition
+│   │   │   ├── nodes.py                # Agent workflow nodes
+│   │   │   └── state.py                # Shared workflow state
+│   │   │
+│   │   ├── services/                   # External integrations
+│   │   │   ├── gemini_service.py
+│   │   │   ├── whisper_service.py
+│   │   │   ├── sheets_service.py
+│   │   │   └── whatsapp_service.py
+│   │   │
+│   │   ├── models/                     # MongoDB models & database layer
+│   │   ├── schemas/                    # Pydantic request/response schemas
+│   │   └── utils/                      # Helper utilities
+│   │
+│   ├── uploads/
+│   │   ├── cards/                      # Uploaded visiting cards
+│   │   └── audio/                      # Uploaded voice notes
+│   │
 │   ├── requirements.txt
 │   ├── Dockerfile
-│   └── .env.example
+│   ├── .env.example
+│   └── README.md
+│
 ├── frontend/
-│   ├── src/
-│   │   ├── components/          # Chat UI components
-│   │   ├── services/api.js      # API client
-│   │   └── App.jsx
-│   ├── Dockerfile
-│   └── package.json
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   ├── .env.example
+│   ├── README.md
+│   │
+│   └── src/
+│       ├── App.jsx                     # Root component
+│       ├── main.jsx                    # React entry point
+│       ├── index.css                   # Global styles
+│       │
+│       ├── context/
+│       │   └── ThemeContext.jsx        # Light/Dark mode management
+│       │
+│       ├── services/
+│       │   └── api.js                  # Backend API client
+│       │
+│       ├── pages/
+│       │   └── ChatPage.jsx            # Main application page
+│       │
+│       └── components/
+│           │
+│           ├── layout/
+│           │   ├── ChatSidebar.jsx     # Chat history sidebar
+│           │   ├── ChatWindow.jsx      # Main chat container
+│           │   └── Header.jsx          # Application header
+│           │
+│           ├── chat/
+│           │   ├── EmptyState.jsx      # Welcome screen
+│           │   ├── MessageBubble.jsx   # User/AI messages
+│           │   └── TypingIndicator.jsx # Loading animation
+│           │
+│           ├── contact/
+│           │   └── ContactPreview.jsx  # Extracted contact preview
+│           │
+│           ├── upload/
+│           │   └── UploadControls.jsx  # Card & audio upload controls
+│           │
+│           └── ui/
+│               ├── Modal.jsx           # Reusable modal component
+│               └── Toast.jsx           # Notifications
+│
 ├── docker-compose.yml
 ├── render.yaml
 └── README.md
@@ -296,6 +349,3 @@ docker compose up --build
 
 ---
 
-## License
-
-MIT — Built for the Krid.AI Visiting Card Digitization assignment.
