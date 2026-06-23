@@ -1,10 +1,13 @@
 """Application configuration loaded from environment variables."""
 
 import json
+import logging
 import os
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings
+
+logger = logging.getLogger(__name__)
 
 
 class Settings(BaseSettings):
@@ -45,4 +48,19 @@ class Settings(BaseSettings):
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    settings = Settings()
+    key = settings.gemini_api_key
+    key_prefix = key[:6] + "..." if len(key) >= 6 else "(empty or too-short)"
+    logger.info(
+        "Settings loaded — GEMINI_API_KEY prefix: %s (length: %d)",
+        key_prefix,
+        len(key),
+    )
+    if not key:
+        logger.warning("GEMINI_API_KEY is NOT set. Card extraction will return demo data.")
+    elif not key.startswith("AIzaSy"):
+        logger.warning(
+            "GEMINI_API_KEY does not start with 'AIzaSy' — this may not be a valid Google API key. "
+            "Please verify the key in your .env file.",
+        )
+    return settings

@@ -1,5 +1,6 @@
 """FastAPI route handlers."""
 
+import logging
 import os
 import uuid
 from typing import Optional
@@ -21,6 +22,8 @@ from app.schemas.schemas import (
     SessionSummary,
 )
 from app.services.session_service import session_service
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api")
 
@@ -75,7 +78,18 @@ async def upload_card(
         {"type": "image", "filename": file.filename},
     )
 
-    result = await run_card_flow(session_id, filepath)
+    try:
+        result = await run_card_flow(session_id, filepath)
+    except ValueError as exc:
+        logger.error("Image processing error in card upload: %s", exc)
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        logger.error("Gemini API error in card upload: %s", exc)
+        raise HTTPException(status_code=502, detail=f"AI service error: {exc}") from exc
+    except Exception as exc:
+        logger.exception("Unexpected error in card upload for session %s", session_id)
+        raise HTTPException(status_code=500, detail="Internal server error during card processing") from exc
+
     card_data = result.get("card_data") or {}
 
     if result.get("message"):
@@ -167,7 +181,17 @@ async def upload_audio(
         {"type": "audio", "filename": file.filename},
     )
 
-    result = await run_voice_flow(session_id, filepath)
+    try:
+        result = await run_voice_flow(session_id, filepath)
+    except ValueError as exc:
+        logger.error("Audio processing error: %s", exc)
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        logger.error("AI service error in audio upload: %s", exc)
+        raise HTTPException(status_code=502, detail=f"AI service error: {exc}") from exc
+    except Exception as exc:
+        logger.exception("Unexpected error in audio upload for session %s", session_id)
+        raise HTTPException(status_code=500, detail="Internal server error during audio processing") from exc
 
     if result.get("message"):
         await session_service.add_message(session_id, "assistant", result["message"])
