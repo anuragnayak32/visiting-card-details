@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+backend/test_gemini_key.py
+.backend/.env
+
+# Node
+node_modules/
+dist/
+frontend/dist/
+
+# Uploads
+uploads/
+backend/uploads/
+backend/kridai-500207-996276752b6b.json
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temp
+pdf_text.txt
+*.log
+# Environment files
+.env
+**/.env
+
+# Google Service Account
+*.json
+!package-lock.json
+!tsconfig.json
